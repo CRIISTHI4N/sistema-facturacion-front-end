@@ -1,0 +1,69 @@
+.scroll::-webkit-scrollbar {
+    width: 5px;
+}
+
+.scroll::-webkit-scrollbar-thumb {
+    background: #64676a;
+    border-radius: 8px;
+}
+
+.scroll::-webkit-scrollbar-thumb:hover {
+    background: #545557;
+}
+
+.banner {
+    background-image: url("/img/banner.jpg");
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.page_error {
+    text-shadow: 1px 1px 2px black;
+    background-image: url("/img/errorpage.jpg");
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+.icon_shop {
+    position: relative;
+    z-index: 10;
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+.icon_shop::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/icons/shop.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+    opacity: 0.2;
+    z-index: 9;
+}
+
+.icon_money {
+    position: relative;
+    z-index: 10;
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+.icon_money::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("/icons/money.svg");
+    background-repeat: no-repeat;
+    background-position: right;
+    opacity: 0.2;
+    z-index: 9;
+}
