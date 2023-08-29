@@ -34,22 +34,22 @@ export const ModalConsultarStock = ({ BASE_URL, stock, setProductoState }) => {
         <tr
             className="even:bg-[#F8F8F8] border-b last-of-type:border-none"
         >
-            <td className="text-start p-2 md:px-7 md:py-5">
+            <td className="text-start p-2 lg:px-7 lg:py-5">
                 {stock.codigo}
             </td>
-            <td className="text-start p-2 md:px-7 md:py-5">
+            <td className="text-start p-2 lg:px-7 lg:py-5">
                 {stock.nombre}
             </td>
-            <td className="text-start p-2 md:px-7 md:py-5">
+            <td className="text-start p-2 lg:px-7 lg:py-5">
                 {stock.cantidad}
             </td>
-            <td className="text-start p-2 md:px-7 md:py-5">
+            <td className="text-start p-2 lg:px-7 lg:py-5">
                 ${stock.precioUnitario.$numberDecimal}
             </td>
-            <td className="text-start p-2 md:px-7 md:py-5 relative">
+            <td className="text-start p-2 lg:px-7 lg:py-5 relative">
                 <button
                     type="button"
-                    className="bg-[#51B1D3] hover:bg-[#238DB4] p-1 md:p-2 rounded-full"
+                    className="bg-[#51B1D3] hover:bg-[#238DB4] p-2 md:p-2 rounded-full"
                     onClick={() => consultarStock(stock._id)}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 md:w-7 md:h-7">

@@ -87,7 +87,7 @@ export const ModalCliente = () => {
                     </button>
                 </div>
 
-                <span className="block text-center text-2xl">Categoría</span>
+                <span className="block text-center text-2xl">Cliente</span>
             </div>
 
             <form

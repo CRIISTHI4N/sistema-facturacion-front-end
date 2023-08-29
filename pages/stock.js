@@ -90,7 +90,7 @@ export default function Stock({ BASE_URL }) {
                                         <tr className="border-b">
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Código</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Nombre</th>
-                                            <th className="text-start p-2 lg:px-7 lg:py-5">Cant.</th>
+                                            <th className="text-start p-2 lg:px-7 lg:py-5">Cantidad</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Pre. Uni.</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Estado</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5"></th>

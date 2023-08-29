@@ -51,8 +51,64 @@ export const AgregarProducto = ({ id, BASE_URL, stockFiltrado, setBusqueda }) =>
         modalStock,
         productos,
         setProductos,
-        usuario
+        usuario,
+        facturaState,
+        editar
     } = useUsuario();
+
+    const {
+        _id,
+        cuerpo: cuerpoState
+    } = facturaState
+
+    useEffect(() => {
+        if (facturaState?._id) {
+            productos.map(p => {
+                if (p.id === id) {
+                    setDescripcionProducto(p.descripcionProducto)
+                    setCantidadProducto(p.cantidadProducto)
+                    setCantidadProductoTemp(p.cantidadProducto)
+                    setIdCuerpoFactura(p.idCuerpo)
+                    setIdStockTemp(p.producto)
+                    setDescuento(p.cantidadProducto)
+                    setProductoState(p.precioUnitario)
+                    setTotal(p.totalProducto.$numberDecimal)
+                    setAgrePro(true)
+                    setEditarPro(false)
+                }
+            })
+
+            return;
+        }
+
+        setIdCuerpoFactura('')
+        setCantidadProductoTemp(0)
+        setDescripcionProducto('')
+        setCantidadProducto(0)
+        setDescuento(0)
+        setProductoState({})
+        setTotal(0)
+        setAgrePro(false)
+        setEditarPro(false)
+
+
+    }, [facturaState])
+
+    useEffect(() => {
+
+
+        if (!editar) {
+            setIdCuerpoFactura('')
+            setCantidadProductoTemp(0)
+            setDescripcionProducto('')
+            setCantidadProducto(0)
+            setDescuento(0)
+            setProductoState({})
+            setTotal(0)
+            setAgrePro(false)
+            setEditarPro(false)
+        }
+    }, [])
 
     const { _id: idStock, precioUnitario } = productoState
 
@@ -80,7 +136,6 @@ export const AgregarProducto = ({ id, BASE_URL, stockFiltrado, setBusqueda }) =>
     const crearProducto = async () => {
 
         if (descripcionProducto === '') { return }
-
         if (cantidadProducto < 1 || isNaN(cantidadProducto) || cantidadProducto === '') { return }
 
         if (descuento < 0 || descuento > 100 || isNaN(descuento) || descuento === '') { return }
@@ -120,13 +175,14 @@ export const AgregarProducto = ({ id, BASE_URL, stockFiltrado, setBusqueda }) =>
             })
             setCantidadProductoTemp(cantidadProducto)
             setIdCuerpoFactura(idCuerpo)
-            setIdStockTemp(idStock)
+            setIdStockTemp(idStock) // OJOOOOOO
             setAgrePro(true) // Desabilita el icono de (+)
 
         } catch (error) { console.log(error) }
     }
 
     const editarProducto = async () => {
+
         if (descripcionProducto === '') { return }
 
         if (cantidadProducto < 1 || isNaN(cantidadProducto || cantidadProducto === '')) { return }

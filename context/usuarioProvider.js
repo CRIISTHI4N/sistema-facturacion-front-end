@@ -22,6 +22,7 @@ export const UsuarioProvider = ({ children }) => {
   const [proveedorState, setProveedorState] = useState({});
   const [cabeceraState, setCabeceraState] = useState({});
   const [clienteState, setClienteState] = useState({});
+  const [facturaState, setFacturaState] = useState({});
   const [totalFactura, setTotalFactura] = useState(0);
   const [toggle, setToggle] = useState(false);
   const [sppiner, setSppiner] = useState(false);
@@ -102,11 +103,10 @@ export const UsuarioProvider = ({ children }) => {
 
   const crearFormProducto = (producto) => {
     setProductos([...productos, producto])
-    setFormulariosFactura([...formulariosFactura, generarId()]);
+    setFormulariosFactura([...formulariosFactura, generarId()])
   }
 
   const eliminarFormStock = async (idForm, idCuerpoFactura, idStock, cantidad) => {
-
     Swal.fire({
       title: '¿Estas seguro de eliminar este producto de la lista?',
       showDenyButton: true,
@@ -123,7 +123,7 @@ export const UsuarioProvider = ({ children }) => {
 
         const URL = process.env.NEXT_PUBLIC_URL;
         const urlDevolverStock = axios.put(`${URL}/factura/devolver-stock/${idStock}/${usuario.token}`, { cantidad })
-        const urlEliminarCuerpoFactura = axios.delete(`${URL}/factura/eliminar-cuerpo-factura/${idCuerpoFactura}`)
+        const urlEliminarCuerpoFactura = axios.delete(`${URL}/factura/eliminar-cuerpo-factura/${idCuerpoFactura}/${usuario.token}`)
 
         try {
           await Promise.all([urlDevolverStock, urlEliminarCuerpoFactura])
@@ -219,7 +219,9 @@ export const UsuarioProvider = ({ children }) => {
         usuario,
         cerrarSesion,
         setNoAcces,
-        noAcces
+        noAcces,
+        setFacturaState,
+        facturaState
       }}
     >
       {children}

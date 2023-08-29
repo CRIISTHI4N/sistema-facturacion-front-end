@@ -39,7 +39,10 @@ export const ModalFactura = ({ BASE_URL }) => {
         totalFactura,
         setTotalFactura,
         setSppiner,
-        usuario
+        usuario,
+        setEditar,
+        editar,
+        facturaState
     } = useUsuario()
 
     const fetcherSotckPersonalizado = () => axios(`${BASE_URL}/stock/listado-compra/${usuario.token}`).then(datos => datos.data)
@@ -52,38 +55,85 @@ export const ModalFactura = ({ BASE_URL }) => {
         ? stockPersonalizado
         : stockPersonalizado.filter(stock => stock.codigo.toLowerCase().includes(busqueda.toLowerCase()))
 
-    const controlModal = async () => {
-        Swal.fire({
-            title: '¿Estas seguro de cancelar esta factura?',
-            showDenyButton: true,
-            confirmButtonText: 'Si',
-            denyButtonText: `Cancelar`
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                setSppiner(true)
+    const {
+        _id,
+        cabecera: cabeceraState,
+        cliente: clienteState,
+        cuerpo: cuerpoState,
+        subtotal: subtotalState
+    } = facturaState
 
-                const cuerpo = productos
-                    .filter(producto => producto.idCuerpo !== undefined)
+    useEffect(() => {
+        if (facturaState?._id) {
+            setBotonMas(true)
+            setCabeceraFactura(cabeceraState?._id);
+            setNombres(clienteState?.nombres)
+            setApellidos(clienteState?.apellidos)
+            setIdentificacion(clienteState?.identificacion)
+            setDireccion(clienteState?.direccion || '')
+            setTelefono(clienteState?.telefono || '')
+            setCorreo(clienteState?.correo || '')
 
-                const consultas = cuerpo.map(async c => {
-                    await axios.delete(`${BASE_URL}/factura/eliminar-cuerpo-factura/${c.idCuerpo}/${usuario.token}`);
-                    await axios.put(`${BASE_URL}/factura/devolver-stock/${c.producto}/${usuario.token}`, { cantidad: c.cantidadProducto });
-                });
+            const idCuerpo = [];
+            const productosFormateados = [];
 
-                try {
-                    await Promise.all(consultas);
-                    resetearValores()
-                    changeModalFactura()
-                    setIdFactura('')
-                    setSppiner(false)
+            cuerpoState.map((cuerpo) => {
+                idCuerpo.push(cuerpo._id);
 
-                } catch (error) { console.log(error) }
+                const productoFormateado = {
+                    id: cuerpo._id,
+                    producto: cuerpo.producto._id,
+                    totalProducto: cuerpo.subtotal,
+                    descripcionProducto: cuerpo.descripcionProducto,
+                    cantidadProducto: cuerpo.cantidadProducto,
+                    descuentoProducto: cuerpo.descuentoProducto,
+                    idCuerpo: cuerpo._id,
+                    precioUnitario: cuerpo.producto
+                };
 
-            } else if (result.isDenied) {
-                return
-            }
-        })
-    }
+                productosFormateados.push(productoFormateado);
+            });
+
+            setFormulariosFactura(idCuerpo);
+            setProductos(productosFormateados);
+            return;
+        }
+
+        setBotonMas(true)
+        setCabeceraFactura('');
+        setNombres('')
+        setApellidos('')
+        setIdentificacion('')
+        setDireccion('')
+        setTelefono('')
+        setCorreo('')
+        setDescripcion('')
+
+        setProductos([])
+        setFormulariosFactura([])
+
+        setTotalFactura(0);
+
+    }, [facturaState])
+
+    useEffect(() => {
+        if (!editar) {
+            setBotonMas(true)
+
+            setCabeceraFactura('');
+            setNombres('')
+            setApellidos('')
+            setIdentificacion('')
+            setDireccion('')
+            setTelefono('')
+            setCorreo('')
+            setDescripcion('')
+
+            setProductos([])
+            setFormulariosFactura([])
+            setTotalFactura(0);
+        }
+    }, [])
 
     // Se ejecuta al momento de recargar la pagina
     useEffect(() => {
@@ -101,67 +151,13 @@ export const ModalFactura = ({ BASE_URL }) => {
     }, [])
 
     useEffect(() => {
-        const totalPagar = productos.reduce((total, p) => total + (Number(p.totalProducto) || 0), 0);
+        const totalPagar = productos.reduce((total, p) => total + (Number(p?.totalProducto) || Number(p?.totalProducto?.$numberDecimal) || 0), 0);
 
         setTotalFactura(totalPagar);
+
+        // productos.length > 0 ? setBotonMas(false) : setBotonMas(true)
+
     }, [productos])
-
-    const mostrarFormProducto = () => {
-        crearFormProducto({})
-        setBotonMas(false)
-    }
-
-    const handleDatosFactura = async e => {
-        e.preventDefault();
-
-        if (cabeceraFactura === '') { return }
-        if (identificacion.length !== 10 || isNaN(identificacion)) { return }
-        if ([nombres, apellidos, identificacion].includes('')) { return }
-
-        Swal.fire({
-            title: 'Crear Factura',
-            showDenyButton: true,
-            confirmButtonText: 'Si',
-            denyButtonText: `Cancelar`
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-
-                setSppiner(true)
-                try {
-                    // 1. Se crean los DATOS DEL CLIENTE
-                    const { data } = await axios.post(`${BASE_URL}/cliente/ingresar/${usuario.token}`, {
-                        nombres,
-                        apellidos,
-                        identificacion,
-                        direccion,
-                        telefono,
-                        correo,
-                        descripcion
-                    })
-
-                    // 2. Extraigo el ID del CUERPO FACTURA (donde esta cada producto)
-                    const cuerpo = productos
-                        .filter(producto => producto.idCuerpo !== undefined)
-                        .map(producto => ({ _id: producto.idCuerpo }));
-
-                    // 3. Creo la FACTURA FINAL
-                    const { data: facturaFinal } = await axios.post(`${BASE_URL}/factura/ingresar-factura/${usuario.token}`, {
-                        cabecera: cabeceraFactura,
-                        cliente: data.cliente,
-                        cuerpo
-                    })
-
-                    setIdFactura(facturaFinal._id)
-                    resetearValores()
-                    changeModalFactura()
-                    changeModalDetalleFactura()
-                    setSppiner(false)
-
-                } catch (error) { console.log(error) }
-
-            } else if (result.isDenied) { return }
-        })
-    }
 
     const resetearValores = () => {
         setProductos([])
@@ -178,10 +174,145 @@ export const ModalFactura = ({ BASE_URL }) => {
         setDescripcion('')
     }
 
+    const controlModal = async () => {
+        Swal.fire({
+            title: '¿Estas seguro de cancelar esta factura?',
+            showDenyButton: true,
+            confirmButtonText: 'Si',
+            denyButtonText: `Cancelar`
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                setSppiner(true)
+
+                const cuerpo = productos
+                    .filter(producto => producto.idCuerpo !== undefined)
+
+                try {
+                    for (const c of cuerpo) {
+                        try {
+                            const devolverStock = axios.put(`${BASE_URL}/factura/devolver-stock/${c.producto}/${usuario.token}`, { cantidad: c.cantidadProducto });
+
+                            const eliminarCuerpoFactura = axios.delete(`${BASE_URL}/factura/eliminar-cuerpo-factura/${c.idCuerpo}/${usuario.token}`);
+
+                            await Promise.all([devolverStock, eliminarCuerpoFactura]);
+
+                        } catch (error) { console.log(error) }
+                    }
+
+                    resetearValores()
+                    changeModalFactura()
+                    setIdFactura('')
+                    setSppiner(false)
+
+                } catch (error) { console.log(error) }
+
+            } else if (result.isDenied) {
+                return
+            }
+        })
+    }
+
+    const mostrarFormProducto = () => {
+        crearFormProducto({})
+        setBotonMas(false)
+    }
+
+    const handleDatosFactura = async e => {
+        e.preventDefault()
+
+        if (cabeceraFactura === '') { return }
+        if (identificacion.length !== 10 || isNaN(identificacion)) { return }
+        if ([nombres, apellidos, identificacion].includes('')) { return }
+
+        if (editar) {
+
+            setSppiner(true)
+            try {
+
+                // 1. Se crean los DATOS DEL CLIENTE
+                const { data } = await axios.put(`${BASE_URL}/cliente/actualizar-cliente/${clienteState?._id}/${usuario.token}`, {
+                    nombres,
+                    apellidos,
+                    identificacion,
+                    direccion,
+                    telefono,
+                    correo,
+                    descripcion
+                })
+
+                // 2. Extraigo el ID del CUERPO FACTURA (donde esta cada producto)
+                const cuerpo = productos
+                    .filter(producto => producto.idCuerpo !== undefined)
+                    .map(producto => ({ _id: producto.idCuerpo }))
+
+                // 3. Actualizo la FACTURA FINAL
+                await axios.put(`${BASE_URL}/factura/actualizar-factura/${_id}/${usuario.token}`, {
+                    cabecera: cabeceraFactura,
+                    cliente: data.cliente,
+                    cuerpo
+                })
+
+                setIdFactura(_id)
+                setEditar(false)
+                changeModalFactura()
+                changeModalDetalleFactura()
+                resetearValores()
+                Swal.fire('Editado correctamente')
+                setSppiner(false)
+
+            } catch (error) { console.log(error) }
+
+        } else {
+            Swal.fire({
+                title: 'Crear Factura',
+                showDenyButton: true,
+                confirmButtonText: 'Si',
+                denyButtonText: `Cancelar`
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    setSppiner(true)
+                    try {
+                        // 1. Se crean los DATOS DEL CLIENTE
+                        const { data } = await axios.post(`${BASE_URL}/cliente/ingresar/${usuario.token}`, {
+                            nombres,
+                            apellidos,
+                            identificacion,
+                            direccion,
+                            telefono,
+                            correo,
+                            descripcion
+                        })
+
+                        // 2. Extraigo el ID del CUERPO FACTURA (donde esta cada producto)
+                        const cuerpo = productos
+                            .filter(producto => producto.idCuerpo !== undefined)
+                            .map(producto => ({ _id: producto.idCuerpo }));
+
+                        // 3. Creo la FACTURA FINAL
+                        const { data: facturaFinal } = await axios.post(`${BASE_URL}/factura/ingresar-factura/${usuario.token}`, {
+                            cabecera: cabeceraFactura,
+                            cliente: data.cliente,
+                            cuerpo
+                        })
+
+                        setIdFactura(facturaFinal._id)
+                        changeModalFactura()
+                        changeModalDetalleFactura()
+                        resetearValores()
+                        setSppiner(false)
+
+                    } catch (error) { console.log(error) }
+
+                } else if (result.isDenied) { return }
+            })
+        }
+    }
+
     return (
         <>
             <div className="py-10 px-5 border-b border-gray-300">
-                <div className="text-center">
+                <div className={`${editar ? 'hidden' : 'block'} text-center`}>
                     <button onClick={controlModal}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 bg-red-100 hover:bg-red-600 hover:text-white p-1 rounded-full">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -189,7 +320,7 @@ export const ModalFactura = ({ BASE_URL }) => {
                     </button>
                 </div>
 
-                <span className="block text-center text-2xl">Factura</span>
+                <span className="block text-center text-2xl">{editar ? 'Editar Factura' : 'Factura'}</span>
             </div>
 
             <form
@@ -211,6 +342,7 @@ export const ModalFactura = ({ BASE_URL }) => {
                         id="cabecera"
                         className={`${cabeceraFactura === '' ? 'border-red-400' : ''} border-2 bg-white px-3 py-2 rounded-sm`}
                         onChange={(e) => setCabeceraFactura(e.target.value)}
+                        value={cabeceraFactura}
                     >
                         <option
                             value=""
@@ -267,15 +399,25 @@ export const ModalFactura = ({ BASE_URL }) => {
                     />
                 ))}
 
-
-                <div className={`${productos.length < 2 ? 'hidden' : 'block'} flex flex-col gap-3 sm:flex-row sm:gap-0 justify-between items-center mt-5`}>
+                <div className={`${editar ? 'block' : 'hidden'} flex flex-col gap-3 sm:flex-row sm:gap-0 justify-between items-center mt-5`}>
                     <input
                         type="submit"
-                        value="Crear Factura"
-                        className="bg-[#3EA8CE] text-lg rounded-md py-2 px-5 cursor-pointer hover:bg-[#238DB4] mr-5 order-last sm:order-first"
+                        value="Editar Factura"
+                        className={`bg-[#3EA8CE] rounded-md px-3 py-2 text-white cursor-pointer hover:bg-[#238DB4]`}
                     />
 
                     <p className="text-2xl">Subtotal: ${totalFactura}</p>
+                </div>
+
+                <div className={`${productos.length < 2 ? 'hidden' : 'block'} flex flex-col gap-3 sm:flex-row sm:gap-0 justify-between items-center mt-5`}>
+
+                    <input
+                        type="submit"
+                        value="Crear Factura"
+                        className={`${editar ? 'hidden' : 'block'} bg-[#3EA8CE] text-lg rounded-md py-2 px-5 cursor-pointer hover:bg-[#238DB4] mr-5 order-last sm:order-first`}
+                    />
+
+                    <p className={`${editar ? 'hidden' : 'block'} text-2xl`}>Subtotal: ${totalFactura}</p>
                 </div>
             </form>
         </>

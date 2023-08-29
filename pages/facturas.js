@@ -62,7 +62,8 @@ const customStylesSpinner = {
         backgroundColor: 'rgba(6, 6, 6, 0.30)',
         height: '100vh',
         width: '100vw',
-        scrollbarColor: 'red'
+        scrollbarColor: 'red',
+        zIndex: '30'
     },
     content: {
         top: '50%',
@@ -144,7 +145,7 @@ export default function Facturas({ BASE_URL }) {
                                 >
                                     <thead>
                                         <tr className="border-b">
-                                            <th className="text-start p-2 lg:px-7 lg:py-5">Nº FRA</th>
+                                            <th className="text-start p-2 lg:px-7 lg:py-5">Nº Factura</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Subtotal</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Descuento</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Total</th>

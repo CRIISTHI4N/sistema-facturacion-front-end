@@ -167,7 +167,7 @@ export default function Negocio({ BASE_URL }) {
                                 id="nombre"
                                 disabled={!editar}
                                 placeholder="*"
-                                className={`${name === '' ? 'border-red-400 placeholder:text-red-400' : ''} border-2 px-2 py-1 outline-none rounded-sm w-full md:w-1/3`}
+                                className={`${name === '' ? 'border-red-400 placeholder:text-red-400' : ''} ${editar ? '' : 'cursor-not-allowed'} border-2 px-2 py-1 outline-none rounded-sm w-full md:w-1/3`}
                                 onChange={e => setName(e.target.value)}
                                 value={name}
                             />
@@ -186,7 +186,7 @@ export default function Negocio({ BASE_URL }) {
                                 id="user"
                                 disabled={!editar}
                                 placeholder="*"
-                                className={`${user === '' ? 'border-red-400 placeholder:text-red-400' : ''} border-2 px-2 py-1 outline-none rounded-sm w-full md:w-1/3`}
+                                className={`${user === '' ? 'border-red-400 placeholder:text-red-400' : ''} ${editar ? '' : 'cursor-not-allowed'} border-2 px-2 py-1 outline-none rounded-sm w-full md:w-1/3`}
                                 onChange={e => setUser(e.target.value)}
                                 value={user}
                             />

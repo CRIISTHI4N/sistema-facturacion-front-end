@@ -89,7 +89,7 @@ export default function Proveedores({ BASE_URL }) {
                                         <tr className="border-b">
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Nombre</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Tlf.</th>
-                                            <th className="text-start p-2 lg:px-7 lg:py-5">Descrip.</th>
+                                            <th className="text-start p-2 lg:px-7 lg:py-5">Descripción</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5">Estado</th>
                                             <th className="text-start p-2 lg:px-7 lg:py-5"></th>
                                         </tr>

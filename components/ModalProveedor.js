@@ -106,6 +106,7 @@ export const ModalProveedor = ({ BASE_URL }) => {
     const editarProveedor = async () => {
         if (editar) {
             if (nombre === '') { return }
+            if (identificacion.length !== 10 || isNaN(identificacion)) { return }
 
             try {
                 await axios.put(`${BASE_URL}/proveedor/actualizar/${_id}/${usuario.token}`, {
@@ -126,6 +127,7 @@ export const ModalProveedor = ({ BASE_URL }) => {
 
         } else {
             if (nombre === '') { return }
+            if (identificacion.length !== 10 || isNaN(identificacion)) { return }
 
             try {
                 await axios.post(`${BASE_URL}/proveedor/ingresar/${usuario.token}`, {
@@ -159,7 +161,7 @@ export const ModalProveedor = ({ BASE_URL }) => {
                     </button>
                 </div>
 
-                <span className="block text-center text-2xl">Categoría</span>
+                <span className="block text-center text-2xl">Proveedor</span>
             </div>
 
             <form
